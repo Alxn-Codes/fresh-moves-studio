@@ -48,6 +48,8 @@ function useLabelTexture(juice: Juice) {
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = 8;
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.offset.x = 0.375; // centre a label panel on the front of the bottle
 
     const draw = (fruit?: HTMLImageElement) => {
       ctx.clearRect(0, 0, 1024, 512);
