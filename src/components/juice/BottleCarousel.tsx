@@ -261,7 +261,7 @@ function Splash({ color, trigger }: { color: string; trigger: number }) {
       </group>
 
       {/* pooled juice under the pour */}
-      <mesh position={[1.35, -1.05, 0]} rotation-x={-Math.PI / 2}>
+      <mesh ref={poolRef} position={[1.35, -1.06, 0]} rotation-x={-Math.PI / 2} visible={false}>
         <circleGeometry args={[0.42, 40]} />
         <meshPhysicalMaterial
           color={color}
@@ -271,6 +271,7 @@ function Splash({ color, trigger }: { color: string; trigger: number }) {
           opacity={0.5}
         />
       </mesh>
+
     </group>
   );
 }
