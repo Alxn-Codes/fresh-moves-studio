@@ -121,6 +121,7 @@ function Splash({ color, trigger }: { color: string; trigger: number }) {
   const streamRef = useRef<THREE.Mesh>(null);
   const dropsRef = useRef<THREE.Group>(null);
   const crownRef = useRef<THREE.Group>(null);
+  const poolRef = useRef<THREE.Mesh>(null);
   const start = useRef(-1);
 
   const curve = useMemo(() => streamCurve(1), []);
@@ -199,6 +200,19 @@ function Splash({ color, trigger }: { color: string; trigger: number }) {
         const k = Math.max(0, 1 - lt / 1.3);
         child.scale.setScalar(0.6 + k * 0.7);
       });
+    }
+
+    // --- spreading pool of juice under the pour ---
+    if (poolRef.current) {
+      const lt = t - (POUR_START + 0.3);
+      const alive = lt > 0 && lt < 2.2;
+      poolRef.current.visible = alive;
+      if (alive) {
+        const g = Math.min(1, lt / 1.2);
+        poolRef.current.scale.setScalar(0.3 + g * 0.9);
+        const m = poolRef.current.material as THREE.MeshPhysicalMaterial;
+        m.opacity = 0.5 * Math.min(1, (2.2 - lt) / 0.6);
+      }
     }
 
     // --- crown ring where the stream hits ---
