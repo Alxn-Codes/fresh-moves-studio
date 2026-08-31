@@ -37,7 +37,7 @@ function Home() {
     return () => clearInterval(t);
   }, [auto]);
 
-  const juice = juices[active];
+  const juice = juices[active] ?? juices[0]!;
 
   const select = (i: number) => {
     setAuto(false);
