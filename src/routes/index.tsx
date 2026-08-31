@@ -57,8 +57,8 @@ function Home() {
           <a href="#process" className="transition-colors hover:text-foreground">
             Process
           </a>
-          <a href="#subscribe" className="transition-colors hover:text-foreground">
-            Subscribe
+          <a href="#about" className="transition-colors hover:text-foreground">
+            About
           </a>
         </nav>
         <a
