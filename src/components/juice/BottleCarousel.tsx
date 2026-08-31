@@ -94,63 +94,202 @@ function useLabelTexture(juice: Juice) {
   return texture;
 }
 
-const SPLASH_COUNT = 18;
+const DROP_COUNT = 26;
+const CYCLE = 4.2; // seconds per pour cycle
+const POUR_START = 0.45;
+const POUR_END = 2.6;
 
+/** Smooth arcing liquid stream built from a tube along a falling parabola. */
+function streamCurve(dir: number) {
+  const pts: THREE.Vector3[] = [];
+  for (let i = 0; i <= 24; i++) {
+    const t = i / 24;
+    const x = dir * (0.18 + t * 1.55);
+    const y = 1.28 + t * 0.85 - 3.1 * t * t;
+    const z = Math.sin(t * 3.1) * 0.12 * dir;
+    pts.push(new THREE.Vector3(x, y, z));
+  }
+  return new THREE.CatmullRomCurve3(pts);
+}
+
+/**
+ * Real-juice pour: a thick liquid ribbon arcs out of the neck, breaks into
+ * droplets, and kicks up a crown of splash beads where it lands.
+ */
 function Splash({ color, trigger }: { color: string; trigger: number }) {
   const group = useRef<THREE.Group>(null);
-  const start = useRef(-10);
-  const seeds = useMemo(
+  const streamRef = useRef<THREE.Mesh>(null);
+  const dropsRef = useRef<THREE.Group>(null);
+  const crownRef = useRef<THREE.Group>(null);
+  const poolRef = useRef<THREE.Mesh>(null);
+  const start = useRef(-1);
+
+  const curve = useMemo(() => streamCurve(1), []);
+  const geom = useMemo(() => new THREE.TubeGeometry(curve, 48, 0.085, 14, false), [curve]);
+  useEffect(() => () => geom.dispose(), [geom]);
+
+  const drops = useMemo(
     () =>
-      Array.from({ length: SPLASH_COUNT }, (_, i) => {
-        const a = (i / SPLASH_COUNT) * Math.PI * 2 + Math.random();
-        const speed = 0.9 + Math.random() * 0.9;
+      Array.from({ length: DROP_COUNT }, (_, i) => {
+        const a = Math.random() * Math.PI * 2;
+        const speed = 0.6 + Math.random() * 1.1;
         return {
-          vx: Math.cos(a) * 0.5 * speed,
-          vz: Math.sin(a) * 0.5 * speed,
-          vy: 1.6 + Math.random() * 1.4,
-          r: 0.045 + Math.random() * 0.05,
+          delay: (i / DROP_COUNT) * 0.9 + Math.random() * 0.25,
+          vx: Math.cos(a) * 0.55 * speed + 0.5,
+          vz: Math.sin(a) * 0.45 * speed,
+          vy: 0.9 + Math.random() * 1.5,
+          r: 0.03 + Math.random() * 0.055,
+        };
+      }),
+    [],
+  );
+
+  const crown = useMemo(
+    () =>
+      Array.from({ length: 14 }, (_, i) => {
+        const a = (i / 14) * Math.PI * 2;
+        return {
+          a,
+          rad: 0.28 + Math.random() * 0.22,
+          up: 0.35 + Math.random() * 0.5,
+          r: 0.03 + Math.random() * 0.04,
+          delay: Math.random() * 0.2,
         };
       }),
     [],
   );
 
   useEffect(() => {
-    start.current = -1; // armed; set on next frame using clock time
+    start.current = -1;
   }, [trigger]);
 
   useFrame((state) => {
     if (!group.current) return;
     if (start.current === -1) start.current = state.clock.elapsedTime;
-    const t = state.clock.elapsedTime - start.current;
-    const alive = t >= 0 && t < 1.5;
-    group.current.visible = alive;
-    if (!alive) return;
-    group.current.children.forEach((child, i) => {
-      const s = seeds[i]!;
-      child.position.set(s.vx * t, 1.05 + s.vy * t - 4.2 * t * t, s.vz * t);
-      const k = Math.max(0, 1 - t / 1.5);
-      child.scale.setScalar(k);
-    });
+    const t = (state.clock.elapsedTime - start.current) % CYCLE;
+
+    // --- stream: grows out of the neck, then retracts ---
+    if (streamRef.current) {
+      const open = t > POUR_START && t < POUR_END;
+      streamRef.current.visible = open;
+      if (open) {
+        const p = (t - POUR_START) / (POUR_END - POUR_START);
+        const grow = Math.min(1, p / 0.28);
+        const fade = Math.min(1, (1 - p) / 0.25);
+        const g = streamRef.current.geometry as THREE.TubeGeometry;
+        g.setDrawRange(0, Math.floor(g.index!.count * grow));
+        const m = streamRef.current.material as THREE.MeshPhysicalMaterial;
+        m.opacity = 0.9 * fade;
+        streamRef.current.scale.x = 0.85 + Math.sin(t * 14) * 0.05;
+      }
+    }
+
+    // --- droplets flung from the landing point ---
+    if (dropsRef.current) {
+      dropsRef.current.children.forEach((child, i) => {
+        const d = drops[i]!;
+        const lt = t - (POUR_START + 0.3 + d.delay);
+        const alive = lt > 0 && lt < 1.3;
+        child.visible = alive;
+        if (!alive) return;
+        child.position.set(
+          0.55 + d.vx * lt,
+          0.35 + d.vy * lt - 3.4 * lt * lt,
+          d.vz * lt,
+        );
+        const k = Math.max(0, 1 - lt / 1.3);
+        child.scale.setScalar(0.6 + k * 0.7);
+      });
+    }
+
+    // --- spreading pool of juice under the pour ---
+    if (poolRef.current) {
+      const lt = t - (POUR_START + 0.3);
+      const alive = lt > 0 && lt < 2.2;
+      poolRef.current.visible = alive;
+      if (alive) {
+        const g = Math.min(1, lt / 1.2);
+        poolRef.current.scale.setScalar(0.3 + g * 0.9);
+        const m = poolRef.current.material as THREE.MeshPhysicalMaterial;
+        m.opacity = 0.5 * Math.min(1, (2.2 - lt) / 0.6);
+      }
+    }
+
+    // --- crown ring where the stream hits ---
+    if (crownRef.current) {
+      crownRef.current.children.forEach((child, i) => {
+        const c = crown[i]!;
+        const lt = t - (POUR_START + 0.35 + c.delay);
+        const alive = lt > 0 && lt < 0.9;
+        child.visible = alive;
+        if (!alive) return;
+        const p = lt / 0.9;
+        child.position.set(
+          1.35 + Math.cos(c.a) * c.rad * (0.4 + p * 1.6),
+          -0.95 + c.up * Math.sin(p * Math.PI) * 1.1,
+          Math.sin(c.a) * c.rad * (0.4 + p * 1.6),
+        );
+        child.scale.setScalar(1 - p * 0.8);
+      });
+    }
   });
 
+  const liquidMat = (extra?: Record<string, unknown>) => (
+    <meshPhysicalMaterial
+      color={color}
+      roughness={0.08}
+      transmission={0.55}
+      thickness={0.9}
+      ior={1.36}
+      clearcoat={1}
+      clearcoatRoughness={0.05}
+      emissive={color}
+      emissiveIntensity={0.2}
+      transparent
+      {...extra}
+    />
+  );
+
   return (
-    <group ref={group} visible={false}>
-      {seeds.map((s, i) => (
-        <mesh key={i}>
-          <sphereGeometry args={[s.r, 12, 12]} />
-          <meshPhysicalMaterial
-            color={color}
-            roughness={0.15}
-            transmission={0.4}
-            thickness={0.3}
-            emissive={color}
-            emissiveIntensity={0.25}
-          />
-        </mesh>
-      ))}
+    <group ref={group}>
+      <mesh ref={streamRef} geometry={geom} visible={false}>
+        {liquidMat({ opacity: 0.9 })}
+      </mesh>
+
+      <group ref={dropsRef}>
+        {drops.map((d, i) => (
+          <mesh key={i} visible={false}>
+            <sphereGeometry args={[d.r, 14, 14]} />
+            {liquidMat({ opacity: 0.95 })}
+          </mesh>
+        ))}
+      </group>
+
+      <group ref={crownRef}>
+        {crown.map((c, i) => (
+          <mesh key={i} visible={false}>
+            <sphereGeometry args={[c.r, 12, 12]} />
+            {liquidMat({ opacity: 0.95 })}
+          </mesh>
+        ))}
+      </group>
+
+      {/* pooled juice under the pour */}
+      <mesh ref={poolRef} position={[1.35, -1.06, 0]} rotation-x={-Math.PI / 2} visible={false}>
+        <circleGeometry args={[0.42, 40]} />
+        <meshPhysicalMaterial
+          color={color}
+          roughness={0.05}
+          clearcoat={1}
+          transparent
+          opacity={0.5}
+        />
+      </mesh>
+
     </group>
   );
 }
+
 
 function Bottle({
   juice,

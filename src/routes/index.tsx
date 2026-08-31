@@ -30,6 +30,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   const [active, setActive] = useState(0);
   const [auto, setAuto] = useState(true);
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     if (!auto) return;
@@ -56,8 +57,8 @@ function Home() {
           <a href="#process" className="transition-colors hover:text-foreground">
             Process
           </a>
-          <a href="#subscribe" className="transition-colors hover:text-foreground">
-            Subscribe
+          <a href="#about" className="transition-colors hover:text-foreground">
+            About
           </a>
         </nav>
         <a
@@ -269,12 +270,105 @@ function Home() {
         </form>
       </section>
 
+      {/* about + contact */}
+      <section id="about" className="border-t border-border bg-card">
+        <div className="mx-auto grid max-w-6xl gap-14 px-6 py-20 md:grid-cols-2 md:px-12">
+          <div>
+            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+              About
+            </span>
+            <h2 className="mt-4 text-3xl md:text-4xl">Built around one idea: press it fresh.</h2>
+            <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+              {BRAND.name} is a small cold-press house working with a handful of regional
+              growers. Every bottle is hydraulically pressed the morning it is picked, filled
+              into returnable glass, and delivered cold within twenty-four hours — no heat, no
+              concentrate, no additives.
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              We keep the range deliberately short: five presses, each built for a moment in the
+              day. What changes is the season, not the recipe philosophy.
+            </p>
+            <dl className="mt-8 grid grid-cols-3 gap-6">
+              {[
+                { k: "Presses", v: "5" },
+                { k: "Grower partners", v: "4" },
+                { k: "Bottles returned", v: "92%" },
+              ].map((s) => (
+                <div key={s.k}>
+                  <dt className="text-xs uppercase tracking-wider text-muted-foreground">
+                    {s.k}
+                  </dt>
+                  <dd className="font-display text-3xl text-primary">{s.v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div id="contact">
+            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+              Contact
+            </span>
+            <h2 className="mt-4 text-3xl md:text-4xl">Talk to us</h2>
+            <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+              Wholesale, events, or a question about a delivery — send a note and we reply
+              within one working day.
+            </p>
+            <form
+              className="mt-8 space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSent(true);
+              }}
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                <input
+                  required
+                  placeholder="Your name"
+                  aria-label="Your name"
+                  className="rounded-2xl border border-border bg-background px-5 py-3 text-sm outline-none focus:border-primary"
+                />
+                <input
+                  required
+                  type="email"
+                  placeholder="Email address"
+                  aria-label="Email address"
+                  className="rounded-2xl border border-border bg-background px-5 py-3 text-sm outline-none focus:border-primary"
+                />
+              </div>
+              <textarea
+                required
+                rows={4}
+                placeholder="How can we help?"
+                aria-label="Message"
+                className="w-full rounded-2xl border border-border bg-background px-5 py-3 text-sm outline-none focus:border-primary"
+              />
+              <button
+                type="submit"
+                className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-transform hover:-translate-y-0.5"
+              >
+                {sent ? "Thanks — we'll be in touch" : "Send message"}
+              </button>
+            </form>
+            <div className="mt-8 space-y-1 text-sm text-muted-foreground">
+              <p>hello@pulpa.co</p>
+              <p>+91 98000 12345</p>
+              <p>Press House 12, Riverside Lane — Mon to Sat, 7am–4pm</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <footer className="border-t border-border px-6 py-10 text-sm text-muted-foreground md:px-12">
         <div className="mx-auto flex max-w-6xl flex-col justify-between gap-3 sm:flex-row">
           <span className="font-display text-lg text-foreground">{BRAND.wordmark}</span>
+          <nav className="flex gap-6">
+            <a href="#about" className="transition-colors hover:text-foreground">About</a>
+            <a href="#contact" className="transition-colors hover:text-foreground">Contact</a>
+          </nav>
           <span>© {new Date().getFullYear()} {BRAND.name}. Pressed, never pasteurised.</span>
         </div>
       </footer>
+
     </main>
   );
 }
