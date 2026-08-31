@@ -30,6 +30,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   const [active, setActive] = useState(0);
   const [auto, setAuto] = useState(true);
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     if (!auto) return;
