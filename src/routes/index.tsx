@@ -277,16 +277,18 @@ function Home() {
             <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
               About
             </span>
-            <h2 className="mt-4 text-3xl md:text-4xl">Built around one idea: press it fresh.</h2>
+            <h2 className="mt-4 text-3xl md:text-4xl">A small press house, five honest bottles.</h2>
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
-              {BRAND.name} is a small cold-press house working with a handful of regional
-              growers. Every bottle is hydraulically pressed the morning it is picked, filled
-              into returnable glass, and delivered cold within twenty-four hours — no heat, no
-              concentrate, no additives.
+              {BRAND.name} began in a single rented kitchen with one hydraulic press and a
+              standing order from a neighbourhood café. We still work the same way: fruit and
+              roots arrive from four regional growers in the morning, go under the press the
+              same day, and never see heat, concentrate or preservative.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              We keep the range deliberately short: five presses, each built for a moment in the
-              day. What changes is the season, not the recipe philosophy.
+              Cold-pressed juice is fragile by design, so we bottle into returnable glass, chill
+              immediately and deliver within twenty-four hours. The range stays deliberately
+              short — five presses, each built for a moment in the day. What changes with the
+              season is the fruit, never the standard.
             </p>
             <dl className="mt-8 grid grid-cols-3 gap-6">
               {[
@@ -302,6 +304,7 @@ function Home() {
                 </div>
               ))}
             </dl>
+
           </div>
 
           <div id="contact">
