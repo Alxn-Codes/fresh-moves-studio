@@ -8,6 +8,10 @@ import fruitVerdant from "@/assets/fruit-verdant.png";
 import fruitEmber from "@/assets/fruit-ember.png";
 import fruitDusk from "@/assets/fruit-dusk.png";
 import fruitCoast from "@/assets/fruit-coast.png";
+import fruitBloom from "@/assets/fruit-bloom.png";
+import fruitMango from "@/assets/fruit-mango.png";
+import fruitIndigo from "@/assets/fruit-indigo.png";
+import fruitGrove from "@/assets/fruit-grove.png";
 
 const FRUIT_IMAGES: Record<string, string> = {
   solstice: fruitSolstice,
@@ -15,25 +19,31 @@ const FRUIT_IMAGES: Record<string, string> = {
   ember: fruitEmber,
   dusk: fruitDusk,
   coast: fruitCoast,
+  bloom: fruitBloom,
+  mango: fruitMango,
+  indigo: fruitIndigo,
+  grove: fruitGrove,
 };
 
 /**
- * Lathe profile matching a squat cold-press bottle:
- * straight cylindrical body, quick shoulder, short neck.
+ * Rounded soft-shouldered bottle profile matching the reference shot:
+ * full belly, generous shoulder curve, short neck, broad cap seat.
  */
 function bottleProfile(scale = 1) {
   const pts: THREE.Vector2[] = [];
   const add = (x: number, y: number) => pts.push(new THREE.Vector2(x * scale, y * scale));
   add(0.001, -1.0);
-  add(0.6, -1.0);
-  add(0.64, -0.94);
-  add(0.64, 0.42);
-  add(0.63, 0.56);
-  add(0.5, 0.78);
-  add(0.34, 0.92);
-  add(0.3, 1.0);
-  add(0.3, 1.14);
-  add(0.001, 1.14);
+  add(0.42, -1.0);
+  add(0.56, -0.95);
+  add(0.62, -0.84);
+  add(0.635, -0.4);
+  add(0.635, 0.34);
+  add(0.61, 0.58);
+  add(0.52, 0.78);
+  add(0.4, 0.92);
+  add(0.31, 1.0);
+  add(0.29, 1.1);
+  add(0.001, 1.1);
   return pts;
 }
 
@@ -55,7 +65,6 @@ function useLabelTexture(juice: Juice) {
       ctx.clearRect(0, 0, 1024, 512);
       ctx.fillStyle = "#faf5ea";
       ctx.fillRect(0, 0, 1024, 512);
-      // two identical panels so both sides of the wrap read correctly
       for (const ox of [0, 512]) {
         ctx.save();
         ctx.translate(ox, 0);
@@ -94,68 +103,96 @@ function useLabelTexture(juice: Juice) {
   return texture;
 }
 
-const DROP_COUNT = 26;
-const CYCLE = 4.2; // seconds per pour cycle
-const POUR_START = 0.45;
-const POUR_END = 2.6;
+/** Cut-out fruit sprite texture used for the floating fruit in the splash. */
+function useFruitTexture(juice: Juice) {
+  const tex = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const loader = new THREE.TextureLoader();
+    const t = loader.load(FRUIT_IMAGES[juice.id] ?? "");
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = 8;
+    return t;
+  }, [juice]);
+  useEffect(() => () => tex?.dispose(), [tex]);
+  return tex;
+}
 
-/** Smooth arcing liquid stream built from a tube along a falling parabola. */
-function streamCurve(dir: number) {
+const RIBBONS = 5;
+const DROPS = 34;
+const FRUITS = 6;
+
+/** One rising, twisting liquid ribbon that wraps around the bottle. */
+function ribbonCurve(seed: number) {
   const pts: THREE.Vector3[] = [];
-  for (let i = 0; i <= 24; i++) {
-    const t = i / 24;
-    const x = dir * (0.18 + t * 1.55);
-    const y = 1.28 + t * 0.85 - 3.1 * t * t;
-    const z = Math.sin(t * 3.1) * 0.12 * dir;
-    pts.push(new THREE.Vector3(x, y, z));
+  const base = seed * ((Math.PI * 2) / RIBBONS);
+  const dir = seed % 2 === 0 ? 1 : -1;
+  for (let i = 0; i <= 26; i++) {
+    const t = i / 26;
+    const a = base + dir * t * 2.4;
+    const rad = 0.95 + Math.sin(t * Math.PI) * 0.75;
+    pts.push(
+      new THREE.Vector3(
+        Math.cos(a) * rad,
+        -1.05 + t * 2.5 + Math.sin(t * Math.PI) * 0.35,
+        Math.sin(a) * rad * 0.75,
+      ),
+    );
   }
   return new THREE.CatmullRomCurve3(pts);
 }
 
 /**
- * Real-juice pour: a thick liquid ribbon arcs out of the neck, breaks into
- * droplets, and kicks up a crown of splash beads where it lands.
+ * Full hero splash: liquid ribbons wrap up and around the bottle, droplets
+ * and beads fly outward, and cut-out fruit floats in the burst.
  */
-function Splash({ color, trigger }: { color: string; trigger: number }) {
-  const group = useRef<THREE.Group>(null);
-  const streamRef = useRef<THREE.Mesh>(null);
+function Splash({ juice, trigger }: { juice: Juice; trigger: number }) {
+  const ribbonsRef = useRef<THREE.Group>(null);
   const dropsRef = useRef<THREE.Group>(null);
-  const crownRef = useRef<THREE.Group>(null);
-  const poolRef = useRef<THREE.Mesh>(null);
+  const fruitRef = useRef<THREE.Group>(null);
   const start = useRef(-1);
+  const fruitTex = useFruitTexture(juice);
 
-  const curve = useMemo(() => streamCurve(1), []);
-  const geom = useMemo(() => new THREE.TubeGeometry(curve, 48, 0.085, 14, false), [curve]);
-  useEffect(() => () => geom.dispose(), [geom]);
+  const ribbons = useMemo(
+    () =>
+      Array.from({ length: RIBBONS }, (_, i) => {
+        const curve = ribbonCurve(i);
+        return {
+          geom: new THREE.TubeGeometry(curve, 60, 0.075 + (i % 3) * 0.02, 12, false),
+          delay: i * 0.16,
+        };
+      }),
+    [],
+  );
+  useEffect(() => () => ribbons.forEach((r) => r.geom.dispose()), [ribbons]);
 
   const drops = useMemo(
     () =>
-      Array.from({ length: DROP_COUNT }, (_, i) => {
-        const a = Math.random() * Math.PI * 2;
-        const speed = 0.6 + Math.random() * 1.1;
+      Array.from({ length: DROPS }, (_, i) => {
+        const a = (i / DROPS) * Math.PI * 2 + Math.random();
         return {
-          delay: (i / DROP_COUNT) * 0.9 + Math.random() * 0.25,
-          vx: Math.cos(a) * 0.55 * speed + 0.5,
-          vz: Math.sin(a) * 0.45 * speed,
-          vy: 0.9 + Math.random() * 1.5,
-          r: 0.03 + Math.random() * 0.055,
+          a,
+          rad: 0.9 + Math.random() * 1.5,
+          y0: -0.9 + Math.random() * 0.4,
+          rise: 1.4 + Math.random() * 1.6,
+          r: 0.028 + Math.random() * 0.06,
+          delay: Math.random() * 1.4,
+          life: 1.5 + Math.random() * 1.2,
+          spin: 0.4 + Math.random() * 0.8,
         };
       }),
     [],
   );
 
-  const crown = useMemo(
+  const fruits = useMemo(
     () =>
-      Array.from({ length: 14 }, (_, i) => {
-        const a = (i / 14) * Math.PI * 2;
-        return {
-          a,
-          rad: 0.28 + Math.random() * 0.22,
-          up: 0.35 + Math.random() * 0.5,
-          r: 0.03 + Math.random() * 0.04,
-          delay: Math.random() * 0.2,
-        };
-      }),
+      Array.from({ length: FRUITS }, (_, i) => ({
+        a: (i / FRUITS) * Math.PI * 2,
+        rad: 1.35 + Math.random() * 0.5,
+        y: -0.6 + Math.random() * 1.6,
+        size: 0.62 + Math.random() * 0.5,
+        bob: 0.5 + Math.random() * 0.7,
+        speed: 0.14 + Math.random() * 0.12,
+      })),
     [],
   );
 
@@ -164,132 +201,106 @@ function Splash({ color, trigger }: { color: string; trigger: number }) {
   }, [trigger]);
 
   useFrame((state) => {
-    if (!group.current) return;
     if (start.current === -1) start.current = state.clock.elapsedTime;
-    const t = (state.clock.elapsedTime - start.current) % CYCLE;
+    const t = state.clock.elapsedTime - start.current;
 
-    // --- stream: grows out of the neck, then retracts ---
-    if (streamRef.current) {
-      const open = t > POUR_START && t < POUR_END;
-      streamRef.current.visible = open;
-      if (open) {
-        const p = (t - POUR_START) / (POUR_END - POUR_START);
-        const grow = Math.min(1, p / 0.28);
-        const fade = Math.min(1, (1 - p) / 0.25);
-        const g = streamRef.current.geometry as THREE.TubeGeometry;
+    if (ribbonsRef.current) {
+      ribbonsRef.current.rotation.y = t * 0.22;
+      ribbonsRef.current.children.forEach((child, i) => {
+        const r = ribbons[i]!;
+        const lt = Math.max(0, t - r.delay);
+        const grow = Math.min(1, lt / 0.9);
+        const mesh = child as THREE.Mesh;
+        const g = mesh.geometry as THREE.TubeGeometry;
         g.setDrawRange(0, Math.floor(g.index!.count * grow));
-        const m = streamRef.current.material as THREE.MeshPhysicalMaterial;
-        m.opacity = 0.9 * fade;
-        streamRef.current.scale.x = 0.85 + Math.sin(t * 14) * 0.05;
-      }
-    }
-
-    // --- droplets flung from the landing point ---
-    if (dropsRef.current) {
-      dropsRef.current.children.forEach((child, i) => {
-        const d = drops[i]!;
-        const lt = t - (POUR_START + 0.3 + d.delay);
-        const alive = lt > 0 && lt < 1.3;
-        child.visible = alive;
-        if (!alive) return;
-        child.position.set(
-          0.55 + d.vx * lt,
-          0.35 + d.vy * lt - 3.4 * lt * lt,
-          d.vz * lt,
-        );
-        const k = Math.max(0, 1 - lt / 1.3);
-        child.scale.setScalar(0.6 + k * 0.7);
+        const m = mesh.material as THREE.MeshPhysicalMaterial;
+        m.opacity = 0.55 + Math.sin(t * 1.4 + i) * 0.15;
+        mesh.scale.y = 1 + Math.sin(t * 1.1 + i) * 0.035;
       });
     }
 
-    // --- spreading pool of juice under the pour ---
-    if (poolRef.current) {
-      const lt = t - (POUR_START + 0.3);
-      const alive = lt > 0 && lt < 2.2;
-      poolRef.current.visible = alive;
-      if (alive) {
-        const g = Math.min(1, lt / 1.2);
-        poolRef.current.scale.setScalar(0.3 + g * 0.9);
-        const m = poolRef.current.material as THREE.MeshPhysicalMaterial;
-        m.opacity = 0.5 * Math.min(1, (2.2 - lt) / 0.6);
-      }
+    if (dropsRef.current) {
+      dropsRef.current.children.forEach((child, i) => {
+        const d = drops[i]!;
+        const lt = (t + d.delay) % d.life;
+        const p = lt / d.life;
+        const a = d.a + t * d.spin * 0.3;
+        const rad = d.rad * (0.55 + p * 0.7);
+        child.position.set(
+          Math.cos(a) * rad,
+          d.y0 + d.rise * Math.sin(p * Math.PI * 0.85),
+          Math.sin(a) * rad * 0.7,
+        );
+        const k = Math.sin(p * Math.PI);
+        child.scale.setScalar(0.35 + k * 0.9);
+        child.visible = k > 0.03;
+      });
     }
 
-    // --- crown ring where the stream hits ---
-    if (crownRef.current) {
-      crownRef.current.children.forEach((child, i) => {
-        const c = crown[i]!;
-        const lt = t - (POUR_START + 0.35 + c.delay);
-        const alive = lt > 0 && lt < 0.9;
-        child.visible = alive;
-        if (!alive) return;
-        const p = lt / 0.9;
+    if (fruitRef.current) {
+      fruitRef.current.children.forEach((child, i) => {
+        const f = fruits[i]!;
+        const a = f.a + t * f.speed;
         child.position.set(
-          1.35 + Math.cos(c.a) * c.rad * (0.4 + p * 1.6),
-          -0.95 + c.up * Math.sin(p * Math.PI) * 1.1,
-          Math.sin(c.a) * c.rad * (0.4 + p * 1.6),
+          Math.cos(a) * f.rad,
+          f.y + Math.sin(t * f.bob + i) * 0.16,
+          Math.sin(a) * f.rad * 0.6 - 0.35,
         );
-        child.scale.setScalar(1 - p * 0.8);
+        child.rotation.z = Math.sin(t * 0.5 + i) * 0.18;
+        child.lookAt(state.camera.position);
       });
     }
   });
 
-  const liquidMat = (extra?: Record<string, unknown>) => (
+  const liquidMat = (opacity: number) => (
     <meshPhysicalMaterial
-      color={color}
-      roughness={0.08}
-      transmission={0.55}
+      color={juice.liquid}
+      roughness={0.06}
+      transmission={0.6}
       thickness={0.9}
       ior={1.36}
       clearcoat={1}
-      clearcoatRoughness={0.05}
-      emissive={color}
-      emissiveIntensity={0.2}
+      clearcoatRoughness={0.04}
+      emissive={juice.liquid}
+      emissiveIntensity={0.22}
       transparent
-      {...extra}
+      opacity={opacity}
+      depthWrite={false}
     />
   );
 
   return (
-    <group ref={group}>
-      <mesh ref={streamRef} geometry={geom} visible={false}>
-        {liquidMat({ opacity: 0.9 })}
-      </mesh>
+    <group>
+      <group ref={ribbonsRef}>
+        {ribbons.map((r, i) => (
+          <mesh key={i} geometry={r.geom}>
+            {liquidMat(0.6)}
+          </mesh>
+        ))}
+      </group>
 
       <group ref={dropsRef}>
         {drops.map((d, i) => (
-          <mesh key={i} visible={false}>
-            <sphereGeometry args={[d.r, 14, 14]} />
-            {liquidMat({ opacity: 0.95 })}
+          <mesh key={i}>
+            <sphereGeometry args={[d.r, 12, 12]} />
+            {liquidMat(0.9)}
           </mesh>
         ))}
       </group>
 
-      <group ref={crownRef}>
-        {crown.map((c, i) => (
-          <mesh key={i} visible={false}>
-            <sphereGeometry args={[c.r, 12, 12]} />
-            {liquidMat({ opacity: 0.95 })}
-          </mesh>
-        ))}
-      </group>
-
-      {/* pooled juice under the pour */}
-      <mesh ref={poolRef} position={[1.35, -1.06, 0]} rotation-x={-Math.PI / 2} visible={false}>
-        <circleGeometry args={[0.42, 40]} />
-        <meshPhysicalMaterial
-          color={color}
-          roughness={0.05}
-          clearcoat={1}
-          transparent
-          opacity={0.5}
-        />
-      </mesh>
-
+      {fruitTex && (
+        <group ref={fruitRef}>
+          {fruits.map((f, i) => (
+            <mesh key={i}>
+              <planeGeometry args={[f.size, f.size]} />
+              <meshBasicMaterial map={fruitTex} transparent toneMapped={false} />
+            </mesh>
+          ))}
+        </group>
+      )}
     </group>
   );
 }
-
 
 function Bottle({
   juice,
@@ -323,37 +334,35 @@ function Bottle({
 
     let offset = index - activeIndex;
     offset = ((offset + count / 2 + count) % count) - count / 2;
-    targetPos.set(offset * 2.35, active ? 0 : -0.2, active ? 0 : -Math.abs(offset) * 1.5);
+    targetPos.set(offset * 2.55, active ? 0 : -0.2, active ? 0 : -Math.abs(offset) * 1.6);
     const k = 1 - Math.exp(-6 * delta);
     group.current.position.lerp(targetPos, k);
-    const s = active ? 1 : 0.74;
+    const s = active ? 1 : 0.72;
     targetScale.set(s, s, s);
     group.current.scale.lerp(targetScale, k);
     group.current.visible = Math.abs(offset) <= 2.2;
 
     const t = state.clock.elapsedTime;
     if (active) {
-      // gentle sway so the label stays readable
       group.current.rotation.y +=
-        (Math.sin(t * 0.6) * 0.32 - group.current.rotation.y) * (1 - Math.exp(-3 * delta));
+        (Math.sin(t * 0.6) * 0.3 - group.current.rotation.y) * (1 - Math.exp(-3 * delta));
       group.current.position.y += Math.sin(t * 1.1) * 0.004;
     } else {
       group.current.rotation.y += delta * 0.25;
     }
 
-    // cap pop on becoming active
     if (capRef.current) {
       if (openStart.current === -1) openStart.current = t;
       const e = t - openStart.current;
       if (active && e >= 0 && e < 1.5) {
         const p = e / 1.5;
-        const lift = Math.sin(Math.min(p, 1) * Math.PI) * 0.9;
-        capRef.current.position.y = 1.2 + lift;
-        capRef.current.rotation.z = lift * 1.6;
-        capRef.current.rotation.x = lift * 0.8;
+        const lift = Math.sin(Math.min(p, 1) * Math.PI) * 0.85;
+        capRef.current.position.y = 1.17 + lift;
+        capRef.current.rotation.z = lift * 1.5;
+        capRef.current.rotation.x = lift * 0.7;
       } else {
         capRef.current.position.y +=
-          (1.2 - capRef.current.position.y) * (1 - Math.exp(-8 * delta));
+          (1.17 - capRef.current.position.y) * (1 - Math.exp(-8 * delta));
         capRef.current.rotation.z *= Math.exp(-8 * delta);
         capRef.current.rotation.x *= Math.exp(-8 * delta);
       }
@@ -395,24 +404,24 @@ function Bottle({
       {/* printed label */}
       {label && (
         <mesh position={[0, -0.14, 0]}>
-          <cylinderGeometry args={[0.652, 0.652, 1.32, 64, 1, true]} />
+          <cylinderGeometry args={[0.645, 0.645, 1.3, 64, 1, true]} />
           <meshStandardMaterial map={label} roughness={0.8} side={THREE.DoubleSide} />
         </mesh>
       )}
 
-      {/* cap */}
-      <group ref={capRef} position={[0, 1.2, 0]}>
+      {/* broad matte cap */}
+      <group ref={capRef} position={[0, 1.17, 0]}>
         <mesh castShadow>
-          <cylinderGeometry args={[0.34, 0.34, 0.22, 48]} />
-          <meshStandardMaterial color="#181410" metalness={0.5} roughness={0.35} />
+          <cylinderGeometry args={[0.36, 0.36, 0.26, 48]} />
+          <meshStandardMaterial color="#c9c6c0" metalness={0.35} roughness={0.45} />
         </mesh>
-        <mesh position={[0, 0.12, 0]}>
-          <cylinderGeometry args={[0.335, 0.335, 0.03, 48]} />
-          <meshStandardMaterial color="#2a241d" metalness={0.6} roughness={0.3} />
+        <mesh position={[0, 0.14, 0]}>
+          <cylinderGeometry args={[0.352, 0.352, 0.03, 48]} />
+          <meshStandardMaterial color="#e2dfd8" metalness={0.4} roughness={0.35} />
         </mesh>
       </group>
 
-      {active && <Splash color={juice.liquid} trigger={activeIndex} />}
+      {active && <Splash juice={juice} trigger={activeIndex} />}
     </group>
   );
 }
@@ -466,7 +475,7 @@ export default function BottleCarousel({
     <Canvas
       shadows
       dpr={[1, 2]}
-      camera={{ position: [0, 0.3, 5.4], fov: 42 }}
+      camera={{ position: [0, 0.3, 5.8], fov: 42 }}
       gl={{ antialias: true }}
     >
       <Suspense fallback={null}>
