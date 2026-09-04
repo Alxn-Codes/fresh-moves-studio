@@ -13,8 +13,8 @@ export type Juice = {
 };
 
 export const BRAND = {
-  name: "PULPA",
-  wordmark: "Pulpa",
+  name: "FRUIT SPLASH",
+  wordmark: "Fruit Splash",
   promise: "Cold-pressed in small batches. Nothing added, nothing hidden.",
 };
 
@@ -135,5 +135,18 @@ export const juices: Juice[] = [
     price: "$8",
     liquid: "#a8d84a",
     glow: "#d3f08a",
+  },
+  {
+    id: "sunburst",
+    name: "Sunburst",
+    tagline: "Orange · Mango · Raspberry · Blueberry",
+    description:
+      "Bright orange and Alphonso mango with a lively berry finish — a juicy, full-flavoured blend inspired by our signature splash bottle.",
+    notes: ["Orange", "Alphonso mango", "Raspberry", "Blueberry"],
+    kcal: 135,
+    volume: "330 ml",
+    price: "$9",
+    liquid: "#f6a800",
+    glow: "#ffd45c",
   },
 ];

@@ -1,24 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ClientOnly } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { juices, BRAND } from "@/data/juices";
-
-const BottleCarousel = lazy(() => import("@/components/juice/BottleCarousel"));
+import BottleCarousel from "@/components/juice/BottleCarousel";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pulpa — Cold-Pressed Juice in Motion" },
+      { title: "Fruit Splash — Cold-Pressed Juice" },
       {
         name: "description",
         content:
-          "Pulpa cold-pressed juice: nine small-batch presses — Solstice, Verdant, Ember, Dusk, Coast, Bloom, Amber, Indigo and Grove — shown in a live 3D bottle carousel.",
+          "Fruit Splash offers ten fresh cold-pressed fruit juices, presented with a cinematic bottle and juice-splash experience.",
       },
-      { property: "og:title", content: "Pulpa — Cold-Pressed Juice in Motion" },
+      { property: "og:title", content: "Fruit Splash — Cold-Pressed Juice" },
       {
         property: "og:description",
         content:
-          "Nine small-batch cold-pressed juices, spinning in 3D. Nothing added, nothing hidden.",
+          "Ten bright cold-pressed juices with real fruit and a cinematic splash.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -87,24 +85,14 @@ function Home() {
               <span className="text-primary">.</span>
             </h1>
             <p className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground">
-              {BRAND.promise} Five presses, pressed at dawn, in your hands before the fruit
+              {BRAND.promise} Ten presses, pressed at dawn, in your hands before the fruit
               forgets where it grew.
             </p>
           </div>
         </div>
 
         <div className="relative mx-auto mt-2 h-[46vh] min-h-[320px] w-full max-w-5xl md:h-[54vh]">
-          <ClientOnly
-            fallback={
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                Loading the bottles…
-              </div>
-            }
-          >
-            <Suspense fallback={null}>
-              <BottleCarousel juices={juices} activeIndex={active} />
-            </Suspense>
-          </ClientOnly>
+          <BottleCarousel juices={juices} activeIndex={active} />
         </div>
 
         {/* active product detail */}
@@ -164,7 +152,7 @@ function Home() {
 
       {/* range grid */}
       <section id="range" className="mx-auto max-w-6xl px-6 py-20 md:px-12">
-        <h2 className="text-3xl md:text-5xl">The nine presses</h2>
+        <h2 className="text-3xl md:text-5xl">The ten presses</h2>
         <p className="mt-3 max-w-lg text-sm text-muted-foreground">
           Each bottle is a single press run. When the fruit is out, the flavour is out until
           next season.
@@ -242,7 +230,7 @@ function Home() {
 
       {/* subscribe */}
       <section id="subscribe" className="mx-auto max-w-3xl px-6 py-24 text-center md:px-12">
-        <h2 className="text-3xl md:text-5xl">Nine bottles, every Friday</h2>
+        <h2 className="text-3xl md:text-5xl">Ten bottles, every Friday</h2>
         <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
           Pick your presses or let us rotate the range with the season. Pause or cancel any
           week — no lock-in.
@@ -277,7 +265,7 @@ function Home() {
             <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
               About
             </span>
-            <h2 className="mt-4 text-3xl md:text-4xl">A small press house, nine honest bottles.</h2>
+            <h2 className="mt-4 text-3xl md:text-4xl">A small press house, ten honest bottles.</h2>
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
               {BRAND.name} began in a single rented kitchen with one hydraulic press and a
               standing order from a neighbourhood café. We still work the same way: fruit and
@@ -287,12 +275,12 @@ function Home() {
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Cold-pressed juice is fragile by design, so we bottle into returnable glass, chill
               immediately and deliver within twenty-four hours. The range stays deliberately
-              short — nine presses, each built for a moment in the day. What changes with the
+              short — ten presses, each built for a moment in the day. What changes with the
               season is the fruit, never the standard.
             </p>
             <dl className="mt-8 grid grid-cols-3 gap-6">
               {[
-                { k: "Presses", v: "9" },
+                { k: "Presses", v: "10" },
                 { k: "Grower partners", v: "4" },
                 { k: "Bottles returned", v: "92%" },
               ].map((s) => (
@@ -353,9 +341,16 @@ function Home() {
               </button>
             </form>
             <div className="mt-8 space-y-1 text-sm text-muted-foreground">
-              <p>hello@pulpa.co</p>
-              <p>+91 98000 12345</p>
-              <p>Press House 12, Riverside Lane — Mon to Sat, 7am–4pm</p>
+              <p>
+                <a href="mailto:alanksanthosh9@gmail.com" className="transition-colors hover:text-foreground">
+                  alanksanthosh9@gmail.com
+                </a>
+              </p>
+              <p>
+                <a href="tel:+91773695680" className="transition-colors hover:text-foreground">
+                  +91 77369 5680
+                </a>
+              </p>
             </div>
           </div>
         </div>

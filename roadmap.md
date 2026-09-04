@@ -8,3 +8,7 @@
 - [x] Update page copy (five -> nine) in index.tsx
 - [x] Verify build + browser
 - [x] Enable Lovable Cloud
+
+- [x] Replace procedural bottles with uploaded Fruit Splash bottle film
+- [x] Rename brand to Fruit Splash and add tenth Sunburst juice
+- [x] Add provided contact email and phone number
