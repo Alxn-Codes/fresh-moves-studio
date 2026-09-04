@@ -117,7 +117,7 @@ function useFruitTexture(juice: Juice) {
   return tex;
 }
 
-const RIBBONS = 5;
+const RIBBONS = 4;
 const DROPS = 34;
 const FRUITS = 4;
 
