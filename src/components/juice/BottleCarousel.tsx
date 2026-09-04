@@ -119,7 +119,7 @@ function useFruitTexture(juice: Juice) {
 
 const RIBBONS = 5;
 const DROPS = 34;
-const FRUITS = 6;
+const FRUITS = 4;
 
 /** One rising, twisting liquid ribbon that wraps around the bottle. */
 function ribbonCurve(seed: number) {
