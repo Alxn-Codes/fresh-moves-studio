@@ -12,13 +12,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Pulpa cold-pressed juice: five small-batch presses — Solstice, Verdant, Ember, Dusk and Coast — shown in a live 3D bottle carousel.",
+          "Pulpa cold-pressed juice: nine small-batch presses — Solstice, Verdant, Ember, Dusk, Coast, Bloom, Amber, Indigo and Grove — shown in a live 3D bottle carousel.",
       },
       { property: "og:title", content: "Pulpa — Cold-Pressed Juice in Motion" },
       {
         property: "og:description",
         content:
-          "Five small-batch cold-pressed juices, spinning in 3D. Nothing added, nothing hidden.",
+          "Nine small-batch cold-pressed juices, spinning in 3D. Nothing added, nothing hidden.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -164,7 +164,7 @@ function Home() {
 
       {/* range grid */}
       <section id="range" className="mx-auto max-w-6xl px-6 py-20 md:px-12">
-        <h2 className="text-3xl md:text-5xl">The five presses</h2>
+        <h2 className="text-3xl md:text-5xl">The nine presses</h2>
         <p className="mt-3 max-w-lg text-sm text-muted-foreground">
           Each bottle is a single press run. When the fruit is out, the flavour is out until
           next season.
@@ -242,7 +242,7 @@ function Home() {
 
       {/* subscribe */}
       <section id="subscribe" className="mx-auto max-w-3xl px-6 py-24 text-center md:px-12">
-        <h2 className="text-3xl md:text-5xl">Six bottles, every Friday</h2>
+        <h2 className="text-3xl md:text-5xl">Nine bottles, every Friday</h2>
         <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
           Pick your presses or let us rotate the range with the season. Pause or cancel any
           week — no lock-in.
@@ -277,7 +277,7 @@ function Home() {
             <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
               About
             </span>
-            <h2 className="mt-4 text-3xl md:text-4xl">A small press house, five honest bottles.</h2>
+            <h2 className="mt-4 text-3xl md:text-4xl">A small press house, nine honest bottles.</h2>
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
               {BRAND.name} began in a single rented kitchen with one hydraulic press and a
               standing order from a neighbourhood café. We still work the same way: fruit and
@@ -287,12 +287,12 @@ function Home() {
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Cold-pressed juice is fragile by design, so we bottle into returnable glass, chill
               immediately and deliver within twenty-four hours. The range stays deliberately
-              short — five presses, each built for a moment in the day. What changes with the
+              short — nine presses, each built for a moment in the day. What changes with the
               season is the fruit, never the standard.
             </p>
             <dl className="mt-8 grid grid-cols-3 gap-6">
               {[
-                { k: "Presses", v: "5" },
+                { k: "Presses", v: "9" },
                 { k: "Grower partners", v: "4" },
                 { k: "Bottles returned", v: "92%" },
               ].map((s) => (
