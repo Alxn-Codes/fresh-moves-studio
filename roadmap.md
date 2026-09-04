@@ -5,6 +5,6 @@
 - [x] Expand range to 9 juices with real fruit stills (4 added)
 - [x] Reshape bottle to rounded body + broad matte cap
 - [x] Full hero splash (ribbons + droplets + floating fruit) on every active bottle
-- [ ] Update page copy (five -> nine) in index.tsx
-- [ ] Verify build + browser
+- [x] Update page copy (five -> nine) in index.tsx
+- [x] Verify build + browser
 - [x] Enable Lovable Cloud
