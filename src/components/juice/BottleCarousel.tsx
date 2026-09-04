@@ -187,11 +187,11 @@ function Splash({ juice, trigger }: { juice: Juice; trigger: number }) {
     () =>
       Array.from({ length: FRUITS }, (_, i) => ({
         a: (i / FRUITS) * Math.PI * 2,
-        rad: 1.35 + Math.random() * 0.5,
-        y: -0.6 + Math.random() * 1.6,
-        size: 0.62 + Math.random() * 0.5,
+        rad: 1.95 + Math.random() * 0.4,
+        y: -0.3 + Math.random() * 1.4,
+        size: 0.55 + Math.random() * 0.35,
         bob: 0.5 + Math.random() * 0.7,
-        speed: 0.14 + Math.random() * 0.12,
+        speed: 0.1 + Math.random() * 0.1,
       })),
     [],
   );
