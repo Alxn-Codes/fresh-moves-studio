@@ -1,4 +1,5 @@
 import type { Juice } from "@/data/juices";
+import SplashVideo from "./SplashVideo";
 import fruitSolstice from "@/assets/fruit-solstice.png";
 import fruitVerdant from "@/assets/fruit-verdant.png";
 import fruitEmber from "@/assets/fruit-ember.png";
@@ -9,9 +10,8 @@ import fruitMango from "@/assets/fruit-mango.png";
 import fruitIndigo from "@/assets/fruit-indigo.png";
 import fruitGrove from "@/assets/fruit-grove.png";
 import fruitSunburst from "@/assets/fruit-sunburst.png";
-import bottleFilm from "@/assets/fruit-splash-bottle.webm.asset.json";
 
-const FRUIT_IMAGES: Record<string, string> = {
+export const FRUIT_IMAGES: Record<string, string> = {
   solstice: fruitSolstice,
   verdant: fruitVerdant,
   ember: fruitEmber,
@@ -35,19 +35,13 @@ export default function BottleCarousel({
   if (!juice) return null;
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-lg bg-card shadow-[var(--shadow-lift)]">
-      <video
-        className="h-full w-full object-cover"
-        src={bottleFilm.url}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        aria-label="Fruit Splash glass bottle surrounded by fruit and a moving juice splash"
-      />
+    <div className="relative h-full w-full overflow-hidden rounded-lg shadow-[var(--shadow-lift)]">
+      <SplashVideo juice={juice} className="h-full w-full rounded-lg" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent" />
-      <div key={juice.id} className="animate-drift pointer-events-none absolute bottom-3 left-3 flex items-end gap-3 sm:bottom-5 sm:left-5">
+      <div
+        key={juice.id}
+        className="animate-drift pointer-events-none absolute bottom-3 left-3 flex items-end gap-3 sm:bottom-5 sm:left-5"
+      >
         <img
           src={FRUIT_IMAGES[juice.id]}
           alt={`${juice.tagline} fruit ingredients`}
