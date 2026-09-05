@@ -9,7 +9,7 @@ import fruitMango from "@/assets/fruit-mango.png";
 import fruitIndigo from "@/assets/fruit-indigo.png";
 import fruitGrove from "@/assets/fruit-grove.png";
 import fruitSunburst from "@/assets/fruit-sunburst.png";
-import bottleFilm from "@/assets/fruit-splash-bottle.mp4.asset.json";
+import bottleFilm from "@/assets/fruit-splash-bottle.webm.asset.json";
 
 const FRUIT_IMAGES: Record<string, string> = {
   solstice: fruitSolstice,
