@@ -158,13 +158,11 @@ function Home() {
           next season.
         </p>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {juices.map((j, i) => (
-            <button
+          {juices.map((j) => (
+            <Link
               key={j.id}
-              onClick={() => {
-                select(i);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
+              to="/juice/$id"
+              params={{ id: j.id }}
               className="group rounded-3xl border border-border bg-card p-6 text-left transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
             >
               <span
@@ -194,9 +192,13 @@ function Home() {
                 </span>
                 <span className="font-medium text-foreground">{j.price}</span>
               </div>
-            </button>
+              <span className="mt-4 inline-block text-sm text-primary">
+                See this juice →
+              </span>
+            </Link>
           ))}
         </div>
+
       </section>
 
       {/* process */}
