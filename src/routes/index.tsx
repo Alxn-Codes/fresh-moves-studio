@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { juices, BRAND } from "@/data/juices";
 import BottleCarousel from "@/components/juice/BottleCarousel";
@@ -349,8 +349,8 @@ function Home() {
                 </a>
               </p>
               <p>
-                <a href="tel:+91773695680" className="transition-colors hover:text-foreground">
-                  +91 77369 5680
+                <a href="tel:+917736956080" className="transition-colors hover:text-foreground">
+                  +91 77369 56080
                 </a>
               </p>
             </div>
