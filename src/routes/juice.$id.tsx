@@ -72,7 +72,7 @@ function JuiceDetail() {
       </header>
 
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-16 md:px-12 lg:grid-cols-2">
-        <div className="h-[46vh] min-h-[320px] w-full overflow-hidden rounded-lg shadow-[var(--shadow-lift)]">
+        <div className="aspect-[16/10] w-full overflow-hidden rounded-lg shadow-[var(--shadow-lift)]">
           <SplashVideo juice={juice} className="h-full w-full" />
         </div>
 
