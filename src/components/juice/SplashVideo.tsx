@@ -1,14 +1,14 @@
 import type { Juice } from "@/data/juices";
-import vidSolstice from "@/assets/vid-solstice.mp4.asset.json";
-import vidVerdant from "@/assets/vid-verdant.mp4.asset.json";
-import vidEmber from "@/assets/vid-ember.mp4.asset.json";
-import vidDusk from "@/assets/vid-dusk.mp4.asset.json";
-import vidCoast from "@/assets/vid-coast.mp4.asset.json";
-import vidBloom from "@/assets/vid-bloom.mp4.asset.json";
-import vidMango from "@/assets/vid-mango.mp4.asset.json";
-import vidIndigo from "@/assets/vid-indigo.mp4.asset.json";
-import vidGrove from "@/assets/vid-grove.mp4.asset.json";
-import vidSunburst from "@/assets/vid-sunburst.mp4.asset.json";
+import vidSolstice from "@/assets/vid-solstice.webm.asset.json";
+import vidVerdant from "@/assets/vid-verdant.webm.asset.json";
+import vidEmber from "@/assets/vid-ember.webm.asset.json";
+import vidDusk from "@/assets/vid-dusk.webm.asset.json";
+import vidCoast from "@/assets/vid-coast.webm.asset.json";
+import vidBloom from "@/assets/vid-bloom.webm.asset.json";
+import vidMango from "@/assets/vid-mango.webm.asset.json";
+import vidIndigo from "@/assets/vid-indigo.webm.asset.json";
+import vidGrove from "@/assets/vid-grove.webm.asset.json";
+import vidSunburst from "@/assets/vid-sunburst.webm.asset.json";
 
 export const JUICE_VIDEOS: Record<string, string> = {
   solstice: vidSolstice.url,
