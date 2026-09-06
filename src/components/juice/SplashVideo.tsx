@@ -1,29 +1,27 @@
 import type { Juice } from "@/data/juices";
-import splash from "@/assets/splash-alpha.webm.asset.json";
+import vidSolstice from "@/assets/vid-solstice.mp4.asset.json";
+import vidVerdant from "@/assets/vid-verdant.mp4.asset.json";
+import vidEmber from "@/assets/vid-ember.mp4.asset.json";
+import vidDusk from "@/assets/vid-dusk.mp4.asset.json";
+import vidCoast from "@/assets/vid-coast.mp4.asset.json";
+import vidBloom from "@/assets/vid-bloom.mp4.asset.json";
+import vidMango from "@/assets/vid-mango.mp4.asset.json";
+import vidIndigo from "@/assets/vid-indigo.mp4.asset.json";
+import vidGrove from "@/assets/vid-grove.mp4.asset.json";
+import vidSunburst from "@/assets/vid-sunburst.mp4.asset.json";
 
-/** Hue of the source footage (orange-mango juice) in degrees. */
-const SOURCE_HUE = 40;
-
-function hexToHue(hex: string) {
-  const m = hex.replace("#", "");
-  const r = parseInt(m.slice(0, 2), 16) / 255;
-  const g = parseInt(m.slice(2, 4), 16) / 255;
-  const b = parseInt(m.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const d = max - min;
-  if (d === 0) return SOURCE_HUE;
-  let h = 0;
-  if (max === r) h = ((g - b) / d) % 6;
-  else if (max === g) h = (b - r) / d + 2;
-  else h = (r - g) / d + 4;
-  return (h * 60 + 360) % 360;
-}
-
-export function juiceFilter(juice: Juice) {
-  const shift = (((hexToHue(juice.liquid) - SOURCE_HUE) % 360) + 540) % 360 - 180;
-  return `hue-rotate(${shift.toFixed(0)}deg) saturate(1.15)`;
-}
+export const JUICE_VIDEOS: Record<string, string> = {
+  solstice: vidSolstice.url,
+  verdant: vidVerdant.url,
+  ember: vidEmber.url,
+  dusk: vidDusk.url,
+  coast: vidCoast.url,
+  bloom: vidBloom.url,
+  mango: vidMango.url,
+  indigo: vidIndigo.url,
+  grove: vidGrove.url,
+  sunburst: vidSunburst.url,
+};
 
 export default function SplashVideo({
   juice,
@@ -32,6 +30,8 @@ export default function SplashVideo({
   juice: Juice;
   className?: string;
 }) {
+  const src = JUICE_VIDEOS[juice.id] ?? vidSunburst.url;
+
   return (
     <div
       className={`relative overflow-hidden rounded-lg ${className}`}
@@ -42,8 +42,7 @@ export default function SplashVideo({
       <video
         key={juice.id}
         className="h-full w-full object-cover"
-        style={{ filter: juiceFilter(juice) }}
-        src={splash.url}
+        src={src}
         autoPlay
         muted
         loop
