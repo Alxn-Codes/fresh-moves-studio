@@ -50,6 +50,24 @@ export default function SplashVideo({
         preload="auto"
         aria-label={`${juice.name} juice splashing around a Fruit Splash bottle`}
       />
+      {/* brand label on the bottle */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2"
+        aria-hidden
+      >
+        <div className="flex flex-col items-center rounded-xl border border-white/50 bg-white/85 px-4 py-2 text-center shadow-lg backdrop-blur-[2px]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-800 sm:text-xs">
+            Fruit Splash
+          </span>
+          <span
+            className="mt-0.5 h-0.5 w-8 rounded-full"
+            style={{ backgroundColor: juice.liquid }}
+          />
+          <span className="mt-1 font-display text-sm leading-none text-neutral-900 sm:text-base">
+            {juice.name}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
