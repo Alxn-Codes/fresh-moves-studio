@@ -15,9 +15,7 @@ export default function BottleCarousel({
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-lg shadow-[var(--shadow-lift)]">
-      <div key={juice.id} className="animate-bottle-in h-full w-full">
-        <SplashVideo juice={juice} className="h-full w-full rounded-lg" />
-      </div>
+      <SplashVideo juice={juice} className="h-full w-full rounded-lg" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent" />
       <div
         key={juice.id}
