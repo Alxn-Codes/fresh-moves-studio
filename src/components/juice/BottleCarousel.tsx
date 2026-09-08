@@ -1,28 +1,7 @@
 import type { Juice } from "@/data/juices";
-import SplashVideo from "./SplashVideo";
-import fruitSolstice from "@/assets/fruit-solstice.png";
-import fruitVerdant from "@/assets/fruit-verdant.png";
-import fruitEmber from "@/assets/fruit-ember.png";
-import fruitDusk from "@/assets/fruit-dusk.png";
-import fruitCoast from "@/assets/fruit-coast.png";
-import fruitBloom from "@/assets/fruit-bloom.png";
-import fruitMango from "@/assets/fruit-mango.png";
-import fruitIndigo from "@/assets/fruit-indigo.png";
-import fruitGrove from "@/assets/fruit-grove.png";
-import fruitSunburst from "@/assets/fruit-sunburst.png";
+import SplashVideo, { FRUIT_IMAGES } from "./SplashVideo";
 
-export const FRUIT_IMAGES: Record<string, string> = {
-  solstice: fruitSolstice,
-  verdant: fruitVerdant,
-  ember: fruitEmber,
-  dusk: fruitDusk,
-  coast: fruitCoast,
-  bloom: fruitBloom,
-  mango: fruitMango,
-  indigo: fruitIndigo,
-  grove: fruitGrove,
-  sunburst: fruitSunburst,
-};
+export { FRUIT_IMAGES };
 
 export default function BottleCarousel({
   juices,
